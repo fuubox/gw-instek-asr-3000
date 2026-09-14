@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import socket
-from typing import Protocol
+from typing import BinaryIO, Protocol
 
 from .errors import CommunicationError, ConnectionTimeout
 
@@ -43,7 +43,7 @@ class SocketTransport:
         self._timeout = timeout
         self._terminator = terminator
         self._sock: socket.socket | None = None
-        self._rfile = None
+        self._rfile: BinaryIO | None = None
 
     @property
     def host(self) -> str:
@@ -62,25 +62,20 @@ class SocketTransport:
         if self._sock is not None:
             return
         try:
-            self._sock = socket.create_connection(
-                (self._host, self._port), timeout=self._timeout
-            )
+            self._sock = socket.create_connection((self._host, self._port), timeout=self._timeout)
             self._sock.settimeout(self._timeout)
             self._rfile = self._sock.makefile("rb")
         except (socket.timeout, TimeoutError) as exc:
             self.close()
-            raise ConnectionTimeout(
-                f"timed out connecting to {self._host}:{self._port}"
-            ) from exc
+            raise ConnectionTimeout(f"timed out connecting to {self._host}:{self._port}") from exc
         except OSError as exc:
             self.close()
-            raise CommunicationError(
-                f"failed to connect to {self._host}:{self._port}: {exc}"
-            ) from exc
+            raise CommunicationError(f"failed to connect to {self._host}:{self._port}: {exc}") from exc
 
     def send(self, data: bytes) -> None:
         """Send raw bytes to the instrument."""
         self._ensure_connected()
+        assert self._sock is not None
         try:
             self._sock.sendall(data)
         except (socket.timeout, TimeoutError) as exc:
@@ -93,6 +88,7 @@ class SocketTransport:
     def readline(self) -> bytes:
         """Read a single response line (terminator stripped)."""
         self._ensure_connected()
+        assert self._rfile is not None
         try:
             line = self._rfile.readline()
         except (socket.timeout, TimeoutError) as exc:
@@ -109,6 +105,7 @@ class SocketTransport:
     def read_exact(self, n: int) -> bytes:
         """Read exactly ``n`` bytes from the instrument."""
         self._ensure_connected()
+        assert self._rfile is not None
         if n <= 0:
             return b""
         try:
@@ -147,5 +144,5 @@ class SocketTransport:
         self.connect()
         return self
 
-    def __exit__(self, *exc_info) -> None:
+    def __exit__(self, *exc_info: object) -> None:
         self.close()

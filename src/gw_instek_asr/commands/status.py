@@ -18,13 +18,13 @@ class StatusCommands(SCPIBase):
     # -- operation ---------------------------------------------------------
 
     def operation_condition(self) -> int:
-        return self.query_int(":STATus:OPERation:CONDition?")
+        return self.query_int_required(":STATus:OPERation:CONDition?")
 
     def operation_enable(self, value: int | None = None) -> int | None:
         return self._register("OPERation", "ENABle", value)
 
     def operation_event(self) -> int:
-        return self.query_int(":STATus:OPERation:EVENt?")
+        return self.query_int_required(":STATus:OPERation:EVENt?")
 
     def operation_ntransition(self, value: int | None = None) -> int | None:
         return self._register("OPERation", "NTRansition", value)
@@ -35,13 +35,13 @@ class StatusCommands(SCPIBase):
     # -- questionable ------------------------------------------------------
 
     def questionable_condition(self) -> int:
-        return self.query_int(":STATus:QUEStionable:CONDition?")
+        return self.query_int_required(":STATus:QUEStionable:CONDition?")
 
     def questionable_enable(self, value: int | None = None) -> int | None:
         return self._register("QUEStionable", "ENABle", value)
 
     def questionable_event(self) -> int:
-        return self.query_int(":STATus:QUEStionable:EVENt?")
+        return self.query_int_required(":STATus:QUEStionable:EVENt?")
 
     def questionable_ntransition(self, value: int | None = None) -> int | None:
         return self._register("QUEStionable", "NTRansition", value)
@@ -52,13 +52,13 @@ class StatusCommands(SCPIBase):
     # -- warning -----------------------------------------------------------
 
     def warning_condition(self) -> int:
-        return self.query_int(":STATus:WARNing:CONDition?")
+        return self.query_int_required(":STATus:WARNing:CONDition?")
 
     def warning_enable(self, value: int | None = None) -> int | None:
         return self._register("WARNing", "ENABle", value)
 
     def warning_event(self) -> int:
-        return self.query_int(":STATus:WARNing:EVENt?")
+        return self.query_int_required(":STATus:WARNing:EVENt?")
 
     def warning_ntransition(self, value: int | None = None) -> int | None:
         return self._register("WARNing", "NTRansition", value)
@@ -69,13 +69,13 @@ class StatusCommands(SCPIBase):
     # -- system lock -------------------------------------------------------
 
     def lock_condition(self) -> int:
-        return self.query_int(":STATus:LOCK:CONDition?")
+        return self.query_int_required(":STATus:LOCK:CONDition?")
 
     def lock_enable(self, value: int | None = None) -> int | None:
         return self._register("LOCK", "ENABle", value)
 
     def lock_event(self) -> int:
-        return self.query_int(":STATus:LOCK:EVENt?")
+        return self.query_int_required(":STATus:LOCK:EVENt?")
 
     def lock_ntransition(self, value: int | None = None) -> int | None:
         return self._register("LOCK", "NTRansition", value)

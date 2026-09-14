@@ -14,8 +14,6 @@ from .._types import (
     SlopeMode,
     TriggerSource,
     VoltageUnit,
-    parse_float,
-    parse_int,
 )
 from ..scpi import SCPIBase
 
@@ -73,9 +71,7 @@ class SystemCommands(SCPIBase):
         if wave_type is None and acv is None and site is None:
             tokens = self.query_csv(cmd + "?")
             return (tokens[0], float(tokens[1]), float(tokens[2]))
-        self.write(
-            f"{cmd} {self._surge_type(wave_type)},{self._int(acv)},{self._int(site)}"
-        )
+        self.write(f"{cmd} {self._surge_type(wave_type)},{self._int(acv)},{self._int(site)}")
         return None
 
     def arbitrary_stair(self, value: Any = None) -> int | None:
@@ -262,15 +258,15 @@ class SystemCommands(SCPIBase):
 
     def tcpip_control(self) -> int:
         """``:SYSTem:COMMunicate:TCPip:CONTrol?`` - socket port number (2268)."""
-        return self.query_int(":SYSTem:COMMunicate:TCPip:CONTrol?")
+        return self.query_int_required(":SYSTem:COMMunicate:TCPip:CONTrol?")
 
     def usb_front_state(self) -> int:
         """``:SYSTem:COMMunicate:USB:FRONt:STATe?`` - front USB-A port state."""
-        return self.query_int(":SYSTem:COMMunicate:USB:FRONt:STATe?")
+        return self.query_int_required(":SYSTem:COMMunicate:USB:FRONt:STATe?")
 
     def usb_rear_state(self) -> int:
         """``:SYSTem:COMMunicate:USB:REAR:STATe?`` - rear USB-B port state."""
-        return self.query_int(":SYSTem:COMMunicate:USB:REAR:STATe?")
+        return self.query_int_required(":SYSTem:COMMunicate:USB:REAR:STATe?")
 
     # -- configuration -----------------------------------------------------
 

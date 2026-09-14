@@ -102,7 +102,7 @@ class ASR3000(
         self.connect()
         return self
 
-    def __exit__(self, *exc_info) -> None:
+    def __exit__(self, *exc_info: object) -> None:
         self.close()
 
     def __repr__(self) -> str:

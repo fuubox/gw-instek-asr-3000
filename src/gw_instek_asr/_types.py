@@ -341,7 +341,7 @@ def fmt_enum(value: Any, enum_cls: type[Enum]) -> str:
     """Format an enumerated value for a SCPI command."""
     member = as_enum(value, enum_cls)
     if issubclass(enum_cls, IntEnum):
-        return str(int(member))
+        return str(member.value)
     return str(member.value)
 
 

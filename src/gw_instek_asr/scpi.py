@@ -81,6 +81,12 @@ class SCPIBase:
     def query_int(self, command: str) -> int | None:
         return parse_int(self.query(command))
 
+    def query_int_required(self, command: str) -> int:
+        value = self.query_int(command)
+        if value is None:
+            raise QueryError(f"expected integer response for {command}")
+        return value
+
     def query_bool(self, command: str) -> bool:
         return as_bool(self.query(command))
 

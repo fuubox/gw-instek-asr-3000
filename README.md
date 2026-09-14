@@ -97,6 +97,16 @@ local TCP socket server to exercise the real transport end-to-end.
 python -m pytest
 ```
 
+For the complete local quality gate, install the development extra and run:
+
+```bash
+python -m pip install -e ".[dev]"
+python -m ruff check src tests scripts examples
+python -m ruff format --check src tests scripts examples
+python -m mypy src/gw_instek_asr
+python -m pytest -q
+```
+
 ## Publishing to PyPI
 
 Publishing is handled by `.github/workflows/publish.yml`, which builds the

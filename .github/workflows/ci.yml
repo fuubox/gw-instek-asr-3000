@@ -1,0 +1,48 @@
+name: Continuous integration
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install package with test dependencies
+        run: python -m pip install ".[dev]"
+      - name: Run tests
+        run: python -m pytest
+      - name: Ruff lint
+        run: python -m ruff check src tests scripts examples
+      - name: Ruff format check
+        run: python -m ruff format --check src tests scripts examples
+      - name: Mypy
+        run: python -m mypy src/gw_instek_asr
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install build dependencies
+        run: python -m pip install ".[dev]" build
+      - name: Build distributions
+        run: python -m build
+      - name: Smoke-test wheel
+        run: |
+          python -m venv .wheel-test
+          . .wheel-test/bin/activate
+          python -m pip install dist/*.whl
+          python -c "import gw_instek_asr"

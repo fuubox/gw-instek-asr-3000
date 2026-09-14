@@ -39,6 +39,8 @@ dependencies = []
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0",
+    "ruff>=0.6.9",
+    "mypy>=1.11",
 ]
 
 [project.urls]
@@ -57,3 +59,28 @@ addopts = "-ra"
 markers = [
     "hardware: requires a physical ASR-3000 connected over Ethernet",
 ]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 130
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.mypy]
+python_version = "3.10"
+files = ["src/gw_instek_asr"]
+check_untyped_defs = false
+disallow_untyped_defs = false
+warn_return_any = false
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = [
+    "gw_instek_asr.transport",
+    "gw_instek_asr._types",
+    "gw_instek_asr.commands.*",
+    "gw_instek_asr.instrument",
+]
+disable_error_code = ["assignment", "union-attr", "attr-defined", "return-value", "call-overload"]

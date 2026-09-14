@@ -14,8 +14,6 @@ from .._types import (
     SlopeMode,
     TriggerSource,
     VoltageUnit,
-    parse_float,
-    parse_int,
 )
 from ..scpi import SCPIBase
 
@@ -73,9 +71,7 @@ class SystemCommands(SCPIBase):
         if wave_type is None and acv is None and site is None:
             tokens = self.query_csv(cmd + "?")
             return (tokens[0], float(tokens[1]), float(tokens[2]))
-        self.write(
-            f"{cmd} {self._surge_type(wave_type)},{self._int(acv)},{self._int(site)}"
-        )
+        self.write(f"{cmd} {self._surge_type(wave_type)},{self._int(acv)},{self._int(site)}")
         return None
 
     def arbitrary_stair(self, value: Any = None) -> int | None:

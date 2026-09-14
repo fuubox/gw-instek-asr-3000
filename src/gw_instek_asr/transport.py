@@ -62,21 +62,15 @@ class SocketTransport:
         if self._sock is not None:
             return
         try:
-            self._sock = socket.create_connection(
-                (self._host, self._port), timeout=self._timeout
-            )
+            self._sock = socket.create_connection((self._host, self._port), timeout=self._timeout)
             self._sock.settimeout(self._timeout)
             self._rfile = self._sock.makefile("rb")
         except (socket.timeout, TimeoutError) as exc:
             self.close()
-            raise ConnectionTimeout(
-                f"timed out connecting to {self._host}:{self._port}"
-            ) from exc
+            raise ConnectionTimeout(f"timed out connecting to {self._host}:{self._port}") from exc
         except OSError as exc:
             self.close()
-            raise CommunicationError(
-                f"failed to connect to {self._host}:{self._port}: {exc}"
-            ) from exc
+            raise CommunicationError(f"failed to connect to {self._host}:{self._port}: {exc}") from exc
 
     def send(self, data: bytes) -> None:
         """Send raw bytes to the instrument."""

@@ -17,7 +17,6 @@ from typing import Any
 
 from gw_instek_asr import OutputMode, Waveform
 
-
 SETTLE_SECONDS = 1.0
 
 

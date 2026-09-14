@@ -37,8 +37,16 @@ written to a timestamped log for later review.
 | `ASR_LOG_DIR`          | `logs`  | Where result logs are written            |
 
 Without a host, the pytest tests are **skipped** (not failures). With a host
-but a non-TTY stdin, prompts are automatically recorded as `UNVERIFIED` and the
-run proceeds unattended.
+but a non-TTY stdin, read-only tests remain available. The checklist is
+hazardous: `ASR_HOST` alone never authorizes reset, configuration, or energized
+output. Run it only when operator-attended and explicitly authorize it:
+
+```powershell
+& ".venv\Scripts\python.exe" -m pytest tests/integration -s --asr-host=192.168.1.100 --allow-output
+```
+
+`--non-interactive` does not replace `--allow-output`; it only records prompts
+as `UNVERIFIED` after output has been separately authorized.
 
 ## What the checklist does
 
@@ -58,6 +66,10 @@ Run order and what to observe at each prompt:
 12. Queries the error queue and status byte, then finishes.
 
 The output is always forced off in a `finally` block, even on error.
+
+If an operator answers “no” to a confirmation, the checklist de-energizes the
+instrument and ends immediately. Non-interactive `UNVERIFIED` confirmations
+continue only when `--allow-output` was explicitly supplied.
 
 ## Result logs
 

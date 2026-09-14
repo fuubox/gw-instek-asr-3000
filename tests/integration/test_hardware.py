@@ -27,6 +27,7 @@ def test_socket_port(hardware, log) -> None:
     assert port == 2268
 
 
+@pytest.mark.hazardous
 def test_hardware_checklist(hardware, log, non_interactive) -> None:
     from .support import run_checklist
 

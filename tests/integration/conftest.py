@@ -34,6 +34,27 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         action="store_true",
         help="Skip operator confirmation prompts (record as UNVERIFIED)",
     )
+    parser.addoption(
+        "--allow-output",
+        action="store_true",
+        help="Authorize reset/configuration and energized output in hazardous hardware tests",
+    )
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    config.addinivalue_line(
+        "markers",
+        "hazardous: test may reset, configure, or energize physical hardware",
+    )
+
+
+def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
+    if config.getoption("--allow-output"):
+        return
+    skip = pytest.mark.skip(reason="requires explicit --allow-output authorization")
+    for item in items:
+        if item.get_closest_marker("hazardous"):
+            item.add_marker(skip)
 
 
 @pytest.fixture(scope="session")

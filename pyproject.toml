@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gw-instek-asr"
+description = "Unofficial Python driver for the GW Instek ASR-3000 series (ASR-3200/3300/3400/3400HF) programmable AC/DC power source"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "0BSD" }
+authors = [{ name = "GW Instek ASR driver contributors" }]
+keywords = [
+    "gw-instek",
+    "gw instek",
+    "asr-3000",
+    "asr-3300",
+    "ac/dc power source",
+    "scpi",
+    "instrument",
+    "lab",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: System :: Hardware",
+]
+dynamic = ["version"]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/fuubox/gw-instek-asr-3000"
+Documentation = "https://github.com/fuubox/gw-instek-asr-3000#readme"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+version = { attr = "gw_instek_asr.__version__" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = [
+    "hardware: requires a physical ASR-3000 connected over Ethernet",
+]

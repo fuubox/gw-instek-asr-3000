@@ -139,14 +139,21 @@ def run_checklist(hardware: Any, log: ResultLog, non_interactive: bool = False) 
         hardware.output_on()
         time.sleep(SETTLE_SECONDS)
         log.record("ac_settle", "INFO", f"waited {SETTLE_SECONDS} s")
-        log.record(
-            "ac_output_indicator",
-            status(confirm("Is the OUTPUT indicator on?", non_interactive)),
+        ac_indicator = confirm("Is the OUTPUT indicator on?", non_interactive)
+        log.record("ac_output_indicator", status(ac_indicator))
+        if ac_indicator is False:
+            hardware.output_off()
+            log.record("aborted", "FAIL", "operator rejected AC output indicator")
+            return
+
+        ac_front_panel = confirm(
+            "Front panel shows ~120.0 V and ~60.00 Hz?", non_interactive
         )
-        log.record(
-            "ac_front_panel",
-            status(confirm("Front panel shows ~120.0 V and ~60.00 Hz?", non_interactive)),
-        )
+        log.record("ac_front_panel", status(ac_front_panel))
+        if ac_front_panel is False:
+            hardware.output_off()
+            log.record("aborted", "FAIL", "operator rejected AC front-panel reading")
+            return
 
         vrms = hardware.voltage_rms()
         irms = hardware.current_rms()
@@ -165,10 +172,12 @@ def run_checklist(hardware: Any, log: ResultLog, non_interactive: bool = False) 
         hardware.output_on()
         time.sleep(SETTLE_SECONDS)
         log.record("dc_settle", "INFO", f"waited {SETTLE_SECONDS} s")
-        log.record(
-            "dc_front_panel",
-            status(confirm("Front panel shows ~48.0 Vdc?", non_interactive)),
-        )
+        dc_front_panel = confirm("Front panel shows ~48.0 Vdc?", non_interactive)
+        log.record("dc_front_panel", status(dc_front_panel))
+        if dc_front_panel is False:
+            hardware.output_off()
+            log.record("aborted", "FAIL", "operator rejected DC front-panel reading")
+            return
         hardware.output_off()
 
         # -- status / error queue ------------------------------------------

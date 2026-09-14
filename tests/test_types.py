@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from gw_instek_asr import InvalidValueError, OutputMode, VoltageRange, Waveform
-from gw_instek_asr._types import as_bool, as_enum, fmt_enum, fmt_number
+from gw_instek_asr._types import as_bool, as_enum, fmt_bool, fmt_enum, fmt_number
 
 
 def test_as_enum_accepts_many_forms():
@@ -30,9 +30,16 @@ def test_fmt_enum():
 def test_as_bool():
     assert as_bool("ON") is True
     assert as_bool("0") is False
+    assert as_bool("+1") is True
+    assert as_bool("+0") is False
     assert as_bool(1) is True
     with pytest.raises(InvalidValueError):
         as_bool("maybe")
+
+
+def test_fmt_bool_accepts_signed_numeric_strings():
+    assert fmt_bool("+1") == "ON"
+    assert fmt_bool("+0") == "OFF"
 
 
 def test_fmt_number():

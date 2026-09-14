@@ -6,7 +6,7 @@ from gw_instek_asr import PowerOnState
 def test_output_state(instrument, transport):
     instrument.output_state(True)
     assert transport.sent[-1] == b":OUTPut:STATe ON\n"
-    transport.queue_line("1")
+    transport.queue_line("+1")
     assert instrument.output_state() is True
 
 

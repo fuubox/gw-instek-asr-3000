@@ -353,10 +353,14 @@ def as_bool(value: Any) -> bool:
         return bool(value)
     if isinstance(value, str):
         key = _normalize(value)
-        if key in ("ON", "1"):
+        if key in ("ON", "TRUE"):
             return True
-        if key in ("OFF", "0"):
+        if key in ("OFF", "FALSE"):
             return False
+        try:
+            return bool(int(key, 10))
+        except ValueError:
+            pass
     raise InvalidValueError(f"cannot interpret {value!r} as boolean")
 
 
@@ -364,10 +368,14 @@ def fmt_bool(value: Any) -> str:
     """Format a boolean value as ``ON``/``OFF``."""
     if isinstance(value, str):
         key = _normalize(value)
-        if key in ("ON", "1"):
+        if key in ("ON", "TRUE"):
             return "ON"
-        if key in ("OFF", "0"):
+        if key in ("OFF", "FALSE"):
             return "OFF"
+        try:
+            return "ON" if int(key, 10) else "OFF"
+        except ValueError:
+            pass
     return "ON" if bool(value) else "OFF"
 
 

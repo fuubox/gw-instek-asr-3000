@@ -11,10 +11,14 @@ import datetime
 import json
 import os
 import sys
+import time
 from pathlib import Path
 from typing import Any
 
 from gw_instek_asr import OutputMode, Waveform
+
+
+SETTLE_SECONDS = 1.0
 
 
 def _log_dir() -> Path:
@@ -133,6 +137,8 @@ def run_checklist(hardware: Any, log: ResultLog, non_interactive: bool = False) 
         log.record("configure_ac", "INFO", "AC-INT, SIN, 120.0 Vrms, 60.0 Hz")
 
         hardware.output_on()
+        time.sleep(SETTLE_SECONDS)
+        log.record("ac_settle", "INFO", f"waited {SETTLE_SECONDS} s")
         log.record(
             "ac_output_indicator",
             status(confirm("Is the OUTPUT indicator on?", non_interactive)),
@@ -157,6 +163,8 @@ def run_checklist(hardware: Any, log: ResultLog, non_interactive: bool = False) 
         log.record("configure_dc", "INFO", "DC-INT, 48.0 Vdc")
 
         hardware.output_on()
+        time.sleep(SETTLE_SECONDS)
+        log.record("dc_settle", "INFO", f"waited {SETTLE_SECONDS} s")
         log.record(
             "dc_front_panel",
             status(confirm("Front panel shows ~48.0 Vdc?", non_interactive)),

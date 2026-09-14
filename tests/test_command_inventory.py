@@ -7,6 +7,21 @@ runtime and excludes no public wrapper.
 
 from __future__ import annotations
 
+from inspect import isfunction
+
+from gw_instek_asr.commands.common import CommonCommands
+from gw_instek_asr.commands.data import DataCommands
+from gw_instek_asr.commands.display import DisplayCommands
+from gw_instek_asr.commands.input import InputCommands
+from gw_instek_asr.commands.measure import MeasureCommands
+from gw_instek_asr.commands.memory import MemoryCommands
+from gw_instek_asr.commands.output import OutputCommands
+from gw_instek_asr.commands.sequence import SequenceCommands
+from gw_instek_asr.commands.simulate import SimulateCommands
+from gw_instek_asr.commands.source import SourceCommands
+from gw_instek_asr.commands.status import StatusCommands
+from gw_instek_asr.commands.system import SystemCommands
+
 INVENTORY = {
     "clear_status": "common",
     "standard_event_status_enable": "common",
@@ -196,7 +211,24 @@ INVENTORY = {
 
 
 def test_inventory_has_every_public_wrapper():
-    assert len(INVENTORY) == 184
+    mixins = (
+        CommonCommands,
+        DataCommands,
+        DisplayCommands,
+        InputCommands,
+        MeasureCommands,
+        MemoryCommands,
+        OutputCommands,
+        SequenceCommands,
+        SimulateCommands,
+        SourceCommands,
+        StatusCommands,
+        SystemCommands,
+    )
+    live = {
+        name for mixin in mixins for name, member in mixin.__dict__.items() if not name.startswith("_") and isfunction(member)
+    }
+    assert set(INVENTORY) == live
     assert set(INVENTORY.values()) == {
         "common",
         "data",

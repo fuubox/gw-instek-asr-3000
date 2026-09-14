@@ -12,6 +12,7 @@ Usage::
 
 from __future__ import annotations
 
+import argparse
 import os
 import sys
 from pathlib import Path
@@ -25,13 +26,22 @@ from tests.integration.support import ResultLog, run_checklist  # noqa: E402
 
 
 def main() -> int:
-    host = sys.argv[1] if len(sys.argv) > 1 else os.environ.get("ASR_HOST")
+    parser = argparse.ArgumentParser(description="Run the guided ASR-3300 hardware checklist")
+    parser.add_argument("host", nargs="?", help="instrument IP address or hostname (default: ASR_HOST)")
+    parser.add_argument("--allow-output", action="store_true", help="authorize reset, configuration, and energized output")
+    parser.add_argument("--non-interactive", action="store_true", help="skip operator prompts and record UNVERIFIED")
+    args = parser.parse_args()
+
+    host = args.host or os.environ.get("ASR_HOST")
     if not host:
-        print("usage: python scripts/hardware_check.py <host>")
+        parser.print_usage()
+        return 2
+    if not args.allow_output:
+        print("refusing to run hazardous checklist without explicit --allow-output")
         return 2
 
     port = int(os.environ.get("ASR_PORT", "2268"))
-    non_interactive = not bool(getattr(sys.stdin, "isatty", lambda: False)())
+    non_interactive = args.non_interactive or not bool(getattr(sys.stdin, "isatty", lambda: False)())
 
     log = ResultLog("asr3000_hardware")
     asr = ASR3300(host, port=port, timeout=15.0)

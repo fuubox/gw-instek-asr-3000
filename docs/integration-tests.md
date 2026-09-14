@@ -24,7 +24,7 @@ written to a timestamped log for later review.
 
 ```powershell
 # or the standalone script (no pytest needed)
-& ".venv\Scripts\python.exe" scripts\hardware_check.py 192.168.1.100
+& ".venv\Scripts\python.exe" scripts\hardware_check.py 192.168.1.100 --allow-output
 ```
 
 ## Options / environment variables
@@ -45,6 +45,9 @@ output. Run it only when operator-attended and explicitly authorize it:
 ```powershell
 & ".venv\Scripts\python.exe" -m pytest tests/integration -s --asr-host=192.168.1.100 --allow-output
 ```
+
+The standalone `scripts/hardware_check.py` command has the same safety gate;
+`ASR_HOST` or a positional host by itself is refused.
 
 `--non-interactive` does not replace `--allow-output`; it only records prompts
 as `UNVERIFIED` after output has been separately authorized.

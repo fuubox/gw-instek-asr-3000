@@ -4,7 +4,7 @@ import pytest
 
 from gw_instek_asr import ASR3000, CommunicationError, ConnectionTimeout, QueryError
 from gw_instek_asr.commands.data import _make_block
-from tests.conftest import RawScpiServer
+from tests.conftest import FakeTransport, RawScpiServer
 
 
 def test_make_block():
@@ -95,3 +95,26 @@ def test_socket_truncated_payload_is_transport_error():
 
 def test_socket_consecutive_blocks_remain_aligned():
     assert _socket_wave([b"#14one!\n", b"#14two!\n"], calls=2) == [b"one!", b"two!"]
+
+
+def test_socket_binary_framing_error_invalidates_before_reconnect():
+    server = RawScpiServer(lambda count, cmd: [b"xstale\n"] if count == 1 else [b"#15fresh\n"])
+    try:
+        with ASR3000(server.host, server.port, timeout=0.2) as inst:
+            with pytest.raises(QueryError, match="expected binary block header"):
+                inst.wave_data(1)
+            assert not inst._transport.connected
+            assert inst.wave_data(1) == b"fresh"
+    finally:
+        server.close()
+
+
+@pytest.mark.parametrize("frame", [b"x14abcd\n", b"#x4abcd\n", b"#1xabcd\n", b"#04\n", b"#49999\n", b"#14abcdX"])
+def test_binary_framing_errors_close_transport(frame):
+    transport = FakeTransport()
+    transport._buf = frame
+    inst = ASR3000(transport=transport, connect=False)
+
+    with pytest.raises(QueryError):
+        inst.wave_data(1)
+    assert transport.closed

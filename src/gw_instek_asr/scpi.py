@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, NoReturn
 
 from ._types import (
     as_bool,
@@ -47,28 +47,33 @@ class SCPIBase:
         """Send a query and read an IEEE 488.2 definite-length binary block."""
         self.write(command)
         tr = self._transport
+
+        def framing_error(message: str) -> NoReturn:
+            tr.close()
+            raise QueryError(message)
+
         marker = tr.read_exact(1)
         if marker != b"#":
-            raise QueryError(f"expected binary block header, got {marker!r}")
+            framing_error(f"expected binary block header, got {marker!r}")
         digit_token = tr.read_exact(1)
         if len(digit_token) != 1 or not digit_token.isdigit():
-            raise QueryError(f"invalid binary block digit count: {digit_token!r}")
+            framing_error(f"invalid binary block digit count: {digit_token!r}")
         ndigits = digit_token[0] - ord("0")
         if ndigits < 1 or ndigits > 4:
-            raise QueryError(f"invalid binary block digit count: {ndigits}")
+            framing_error(f"invalid binary block digit count: {ndigits}")
         length_token = tr.read_exact(ndigits)
         if len(length_token) != ndigits or not length_token.isdigit():
-            raise QueryError(f"invalid binary block length: {length_token!r}")
+            framing_error(f"invalid binary block length: {length_token!r}")
         length = int(length_token)
         if length > _WAVEFORM_MAX_BLOCK:
-            raise QueryError(f"binary block length {length} exceeds maximum {_WAVEFORM_MAX_BLOCK}")
+            framing_error(f"binary block length {length} exceeds maximum {_WAVEFORM_MAX_BLOCK}")
         data = tr.read_exact(length)
         terminator = tr.read_exact(1)
         if terminator == b"\r":
             if tr.read_exact(1) != b"\n":
-                raise QueryError("binary block has invalid CRLF terminator")
+                framing_error("binary block has invalid CRLF terminator")
         elif terminator != b"\n":
-            raise QueryError(f"binary block missing LF terminator: {terminator!r}")
+            framing_error(f"binary block missing LF terminator: {terminator!r}")
         return data
 
     # -- typed queries -----------------------------------------------------

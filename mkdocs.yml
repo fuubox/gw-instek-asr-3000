@@ -2,6 +2,7 @@ site_name: GW Instek ASR-3000 Python Driver
 site_description: Navigable API reference for the GW Instek ASR-3000 series
 repo_url: https://github.com/fuubox/gw-instek-asr-3000
 strict: true
+site_dir: build/docs
 theme:
   name: readthedocs
 plugins:

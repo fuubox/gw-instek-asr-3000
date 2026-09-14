@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from gw_instek_asr.commands.data import _make_block
-from gw_instek_asr import ASR3000, CommunicationError, QueryError
+from gw_instek_asr import ASR3000, CommunicationError, ConnectionTimeout, QueryError
 from tests.conftest import RawScpiServer
 
 
@@ -57,6 +57,17 @@ def test_socket_fragmented_block_and_lf():
 
 def test_socket_crlf_block():
     assert _socket_wave([b"#14abcd\r\n"], calls=1) == [b"abcd"]
+
+
+def test_socket_missing_block_terminator_times_out_and_invalidates():
+    server = RawScpiServer(lambda count, cmd: [b"#14abcd"])
+    try:
+        inst = ASR3000(server.host, server.port, timeout=0.05)
+        with pytest.raises(ConnectionTimeout):
+            inst.wave_data(1)
+        assert not inst._transport.connected
+    finally:
+        server.close()
 
 
 @pytest.mark.parametrize("frame", [

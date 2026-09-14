@@ -101,7 +101,7 @@ def test_read_timeout_invalidates_transport():
 
 
 def test_partial_exact_read_invalidates_transport():
-    server = RawScpiServer(lambda count, cmd: [b"a"] if False else "close")
+    server = RawScpiServer(lambda count, cmd: ("close_after", [b"a"]))
     try:
         t = SocketTransport(server.host, server.port, timeout=0.2)
         # The server closes before delivering the requested two bytes.

@@ -76,12 +76,18 @@ class RawScpiServer:
                         if response == "close":
                             conn.shutdown(socket.SHUT_RDWR)
                             break
+                        close_after = isinstance(response, tuple) and response[0] == "close_after"
+                        if close_after:
+                            response = response[1]
                         if response is None:
                             continue
                         if isinstance(response, bytes):
                             response = [response]
                         for chunk in response:
                             conn.sendall(chunk)
+                        if close_after:
+                            conn.shutdown(socket.SHUT_RDWR)
+                            break
 
     def close(self):
         self._sock.close()

@@ -32,6 +32,8 @@ pip install -e ".[dev]"   # include pytest
 
 Requires Python 3.10+.
 
+See [CHANGELOG.md](CHANGELOG.md) for release notes.
+
 ## Quick start
 
 The ASR-3000 socket server port is fixed at **2268**.
@@ -111,7 +113,7 @@ python -m pytest -q
 
 Publishing is handled by `.github/workflows/publish.yml`, which builds the
 sdist/wheel, runs the test suite, and publishes to PyPI when you push a tag
-like `v0.1.0` (or trigger the workflow manually). Configure one of:
+like `v0.2.0` (or trigger the workflow manually). Configure one of:
 
 - **Trusted publishing (recommended):** in PyPI → *Publishing*, add a trusted
   publisher for this repo (owner `fuubox`, repo `gw-instek-asr-3000`); no

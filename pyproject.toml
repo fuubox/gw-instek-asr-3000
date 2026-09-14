@@ -42,6 +42,11 @@ dev = [
     "ruff>=0.6.9",
     "mypy>=1.11",
 ]
+docs = [
+    "mkdocs>=1.6,<2",
+    "mkdocstrings[python]>=0.27,<1",
+    "mkdocs-gen-files>=0.5,<1",
+]
 
 [project.urls]
 Homepage = "https://github.com/fuubox/gw-instek-asr-3000"

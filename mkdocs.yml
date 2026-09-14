@@ -1,0 +1,46 @@
+site_name: GW Instek ASR-3000 Python Driver
+site_description: Navigable API reference for the GW Instek ASR-3000 series
+repo_url: https://github.com/fuubox/gw-instek-asr-3000
+strict: true
+site_dir: build/docs
+theme:
+  name: readthedocs
+plugins:
+  - search
+  - gen-files:
+      scripts:
+        - docs/gen_scpi_index.py
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: false
+            members_order: source
+            show_root_heading: true
+            show_object_full_path: false
+            inherited_members: false
+            heading_level: 2
+nav:
+  - Home: index.md
+  - Quick start: quick-start.md
+  - API conventions: conventions.md
+  - Integration tests: integration-tests.md
+  - SCPI index: scpi-index.md
+  - API reference:
+      - Instruments: api/instrument.md
+      - Common commands: api/common.md
+      - Output commands: api/output.md
+      - Source commands: api/source.md
+      - Measurement commands: api/measure.md
+      - System commands: api/system.md
+      - Status commands: api/status.md
+      - Sequence commands: api/sequence.md
+      - Simulation commands: api/simulate.md
+      - Data commands: api/data.md
+      - Memory commands: api/memory.md
+      - Input commands: api/input.md
+      - Display commands: api/display.md
+      - Types: api/types.md
+      - Errors: api/errors.md
+      - Transport: api/transport.md

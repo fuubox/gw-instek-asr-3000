@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import pytest
+
 from gw_instek_asr import OutputMode, VoltageRange, Waveform
+from gw_instek_asr import QueryError
 
 
 def test_voltage_set(instrument, transport):
@@ -62,6 +65,19 @@ def test_read_parses_17_fields(instrument, transport):
     assert r.thd_v is None
     assert r.thd_i is None
     assert r.frequency is None
+
+
+@pytest.mark.parametrize("reply", ["1,2,3", ",".join(["1"] * 18)])
+def test_read_rejects_wrong_field_count(instrument, transport, reply):
+    transport.queue_line(reply)
+    with pytest.raises(QueryError, match=r":READ\? expected 17 fields"):
+        instrument.read()
+
+
+def test_read_rejects_malformed_numeric_token(instrument, transport):
+    transport.queue_line(",".join(["1"] * 16 + ["oops"]))
+    with pytest.raises(QueryError, match=r":READ\? invalid numeric token at field 17"):
+        instrument.read()
 
 
 def test_current_limit(instrument, transport):

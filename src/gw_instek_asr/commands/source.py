@@ -14,6 +14,7 @@ from .._types import (
     parse_float,
 )
 from ..scpi import SCPIBase
+from ..errors import QueryError
 
 _READ_FIELDS = (
     "vrms",
@@ -166,9 +167,18 @@ class SourceCommands(SCPIBase):
     def read(self) -> Readings:
         """``[:SOURce]:READ?`` - return the full measurement readout."""
         tokens = self.query_csv(":READ?")
-        values = [parse_float(t) for t in tokens]
-        if len(values) < len(_READ_FIELDS):
-            values.extend([None] * (len(_READ_FIELDS) - len(values)))
+        if len(tokens) != len(_READ_FIELDS):
+            raise QueryError(
+                f":READ? expected {len(_READ_FIELDS)} fields, got {len(tokens)}"
+            )
+        values = []
+        for position, token in enumerate(tokens, 1):
+            try:
+                values.append(parse_float(token))
+            except (TypeError, ValueError) as exc:
+                raise QueryError(
+                    f":READ? invalid numeric token at field {position}: {token!r}"
+                ) from exc
         return Readings(**dict(zip(_READ_FIELDS, values)))
 
     # -- voltage -----------------------------------------------------------

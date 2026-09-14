@@ -84,8 +84,10 @@ class SocketTransport:
         try:
             self._sock.sendall(data)
         except (socket.timeout, TimeoutError) as exc:
+            self.close()
             raise ConnectionTimeout("timed out writing to instrument") from exc
         except OSError as exc:
+            self.close()
             raise CommunicationError(f"write failed: {exc}") from exc
 
     def readline(self) -> bytes:
@@ -94,10 +96,13 @@ class SocketTransport:
         try:
             line = self._rfile.readline()
         except (socket.timeout, TimeoutError) as exc:
+            self.close()
             raise ConnectionTimeout("timed out reading from instrument") from exc
         except OSError as exc:
+            self.close()
             raise CommunicationError(f"read failed: {exc}") from exc
         if not line:
+            self.close()
             raise CommunicationError("connection closed by instrument")
         return line.rstrip(b"\r\n")
 
@@ -109,10 +114,13 @@ class SocketTransport:
         try:
             data = self._rfile.read(n)
         except (socket.timeout, TimeoutError) as exc:
+            self.close()
             raise ConnectionTimeout("timed out reading from instrument") from exc
         except OSError as exc:
+            self.close()
             raise CommunicationError(f"read failed: {exc}") from exc
         if data is None or len(data) < n:
+            self.close()
             raise CommunicationError("connection closed while reading block data")
         return data
 

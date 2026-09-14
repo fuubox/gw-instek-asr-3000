@@ -19,6 +19,7 @@ from .errors import QueryError
 from .transport import Transport
 
 _TERMINATOR = b"\n"
+_WAVEFORM_MAX_BLOCK = 8192
 
 
 class SCPIBase:
@@ -49,10 +50,27 @@ class SCPIBase:
         marker = tr.read_exact(1)
         if marker != b"#":
             raise QueryError(f"expected binary block header, got {marker!r}")
-        ndigits = int(tr.read_exact(1))
-        length = int(tr.read_exact(ndigits))
+        digit_token = tr.read_exact(1)
+        if len(digit_token) != 1 or not digit_token.isdigit():
+            raise QueryError(f"invalid binary block digit count: {digit_token!r}")
+        ndigits = digit_token[0] - ord("0")
+        if ndigits < 1 or ndigits > 4:
+            raise QueryError(f"invalid binary block digit count: {ndigits}")
+        length_token = tr.read_exact(ndigits)
+        if len(length_token) != ndigits or not length_token.isdigit():
+            raise QueryError(f"invalid binary block length: {length_token!r}")
+        length = int(length_token)
+        if length > _WAVEFORM_MAX_BLOCK:
+            raise QueryError(
+                f"binary block length {length} exceeds maximum {_WAVEFORM_MAX_BLOCK}"
+            )
         data = tr.read_exact(length)
-        tr.readline()  # consume trailing terminator, if present
+        terminator = tr.read_exact(1)
+        if terminator == b"\r":
+            if tr.read_exact(1) != b"\n":
+                raise QueryError("binary block has invalid CRLF terminator")
+        elif terminator != b"\n":
+            raise QueryError(f"binary block missing LF terminator: {terminator!r}")
         return data
 
     # -- typed queries -----------------------------------------------------

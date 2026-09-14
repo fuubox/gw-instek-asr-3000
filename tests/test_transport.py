@@ -5,8 +5,9 @@ import threading
 
 import pytest
 
-from gw_instek_asr import ASR3000, CommunicationError
+from gw_instek_asr import ASR3000, CommunicationError, ConnectionTimeout
 from gw_instek_asr.transport import SocketTransport
+from tests.conftest import RawScpiServer
 
 
 class _ScpiServer:
@@ -69,3 +70,61 @@ def test_instrument_over_socket():
 def test_connection_refused():
     with pytest.raises(CommunicationError):
         ASR3000("127.0.0.1", 1, timeout=0.5)
+
+
+@pytest.mark.parametrize("operation", ["line", "exact"])
+def test_peer_eof_invalidates_transport(operation):
+    server = RawScpiServer(lambda count, cmd: "close")
+    try:
+        t = SocketTransport(server.host, server.port, timeout=0.2)
+        t.send(b"READ?\n")
+        if operation == "line":
+            with pytest.raises(CommunicationError):
+                t.readline()
+        else:
+            with pytest.raises(CommunicationError):
+                t.read_exact(2)
+        assert not t.connected
+    finally:
+        server.close()
+
+
+def test_read_timeout_invalidates_transport():
+    server = RawScpiServer(lambda count, cmd: None)
+    try:
+        t = SocketTransport(server.host, server.port, timeout=0.05)
+        with pytest.raises(ConnectionTimeout):
+            t.readline()
+        assert not t.connected
+    finally:
+        server.close()
+
+
+def test_partial_exact_read_invalidates_transport():
+    server = RawScpiServer(lambda count, cmd: ("close_after", [b"a"]))
+    try:
+        t = SocketTransport(server.host, server.port, timeout=0.2)
+        # The server closes before delivering the requested two bytes.
+        t.send(b"BLOCK?\n")
+        with pytest.raises(CommunicationError):
+            t.read_exact(2)
+        assert not t.connected
+    finally:
+        server.close()
+
+
+def test_failed_operation_is_not_replayed_and_reconnects():
+    server = RawScpiServer(
+        lambda count, cmd: "close" if count == 1 else [b"fresh\n"]
+    )
+    try:
+        t = SocketTransport(server.host, server.port, timeout=0.2)
+        with pytest.raises(CommunicationError):
+            t.send(b"STATE 1\n")
+            t.readline()
+        assert not t.connected
+        t.send(b"QUERY?\n")
+        assert t.readline() == b"fresh"
+        assert server.commands == [b"STATE 1", b"QUERY?"]
+    finally:
+        server.close()

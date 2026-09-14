@@ -168,17 +168,13 @@ class SourceCommands(SCPIBase):
         """``[:SOURce]:READ?`` - return the full measurement readout."""
         tokens = self.query_csv(":READ?")
         if len(tokens) != len(_READ_FIELDS):
-            raise QueryError(
-                f":READ? expected {len(_READ_FIELDS)} fields, got {len(tokens)}"
-            )
+            raise QueryError(f":READ? expected {len(_READ_FIELDS)} fields, got {len(tokens)}")
         values = []
         for position, token in enumerate(tokens, 1):
             try:
                 values.append(parse_float(token))
             except (TypeError, ValueError) as exc:
-                raise QueryError(
-                    f":READ? invalid numeric token at field {position}: {token!r}"
-                ) from exc
+                raise QueryError(f":READ? invalid numeric token at field {position}: {token!r}") from exc
         return Readings(**dict(zip(_READ_FIELDS, values)))
 
     # -- voltage -----------------------------------------------------------

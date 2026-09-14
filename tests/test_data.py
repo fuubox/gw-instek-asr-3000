@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from gw_instek_asr.commands.data import _make_block
 from gw_instek_asr import ASR3000, CommunicationError, ConnectionTimeout, QueryError
+from gw_instek_asr.commands.data import _make_block
 from tests.conftest import RawScpiServer
 
 
@@ -70,9 +70,17 @@ def test_socket_missing_block_terminator_times_out_and_invalidates():
         server.close()
 
 
-@pytest.mark.parametrize("frame", [
-    b"x14abcd\n", b"#x4abcd\n", b"#1xabcd\n", b"#04\n", b"#49999\n", b"#14ab\n",
-])
+@pytest.mark.parametrize(
+    "frame",
+    [
+        b"x14abcd\n",
+        b"#x4abcd\n",
+        b"#1xabcd\n",
+        b"#04\n",
+        b"#49999\n",
+        b"#14ab\n",
+    ],
+)
 def test_socket_malformed_block_is_query_error(frame):
     with pytest.raises((QueryError, CommunicationError)) as exc:
         _socket_wave([frame], calls=1)

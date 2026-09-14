@@ -114,9 +114,7 @@ def test_partial_exact_read_invalidates_transport():
 
 
 def test_failed_operation_is_not_replayed_and_reconnects():
-    server = RawScpiServer(
-        lambda count, cmd: "close" if count == 1 else [b"fresh\n"]
-    )
+    server = RawScpiServer(lambda count, cmd: "close" if count == 1 else [b"fresh\n"])
     try:
         t = SocketTransport(server.host, server.port, timeout=0.2)
         with pytest.raises(CommunicationError):

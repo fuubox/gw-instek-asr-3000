@@ -41,9 +41,7 @@ def test_allow_output_enables_hazardous_checklist():
 
 def test_non_interactive_does_not_authorize_output():
     hazardous = FakeItem(True)
-    config = SimpleNamespace(
-        getoption=lambda name: name == "--non-interactive"
-    )
+    config = SimpleNamespace(getoption=lambda name: name == "--non-interactive")
 
     conftest.pytest_collection_modifyitems(config, [hazardous])
 

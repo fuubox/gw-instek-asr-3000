@@ -145,9 +145,7 @@ def run_checklist(hardware: Any, log: ResultLog, non_interactive: bool = False) 
             log.record("aborted", "FAIL", "operator rejected AC output indicator")
             return
 
-        ac_front_panel = confirm(
-            "Front panel shows ~120.0 V and ~60.00 Hz?", non_interactive
-        )
+        ac_front_panel = confirm("Front panel shows ~120.0 V and ~60.00 Hz?", non_interactive)
         log.record("ac_front_panel", status(ac_front_panel))
         if ac_front_panel is False:
             hardware.output_off()

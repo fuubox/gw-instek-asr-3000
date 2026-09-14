@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import socket
+
 import pytest
 
 from gw_instek_asr import ASR3000

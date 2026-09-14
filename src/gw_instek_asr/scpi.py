@@ -61,9 +61,7 @@ class SCPIBase:
             raise QueryError(f"invalid binary block length: {length_token!r}")
         length = int(length_token)
         if length > _WAVEFORM_MAX_BLOCK:
-            raise QueryError(
-                f"binary block length {length} exceeds maximum {_WAVEFORM_MAX_BLOCK}"
-            )
+            raise QueryError(f"binary block length {length} exceeds maximum {_WAVEFORM_MAX_BLOCK}")
         data = tr.read_exact(length)
         terminator = tr.read_exact(1)
         if terminator == b"\r":

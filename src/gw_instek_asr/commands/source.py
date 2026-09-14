@@ -13,8 +13,8 @@ from .._types import (
     Waveform,
     parse_float,
 )
-from ..scpi import SCPIBase
 from ..errors import QueryError
+from ..scpi import SCPIBase
 
 _READ_FIELDS = (
     "vrms",

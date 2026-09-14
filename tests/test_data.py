@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import pytest
+
 from gw_instek_asr.commands.data import _make_block
+from gw_instek_asr import ASR3000, CommunicationError, QueryError
+from tests.conftest import RawScpiServer
 
 
 def test_make_block():
@@ -34,3 +38,41 @@ def test_sequence_memory(instrument, transport):
 def test_wave_clear(instrument, transport):
     instrument.wave_clear(13)
     assert transport.sent[-1] == b":DATA:TRACe:WAVe:CLEar 13\n"
+
+
+def _socket_wave(response, calls=1):
+    server = RawScpiServer(lambda count, cmd: response[count - 1] if calls > 1 else response)
+    try:
+        with ASR3000(server.host, server.port, timeout=0.2) as inst:
+            result = [inst.wave_data(1) for _ in range(calls)]
+        return result
+    finally:
+        server.close()
+
+
+def test_socket_fragmented_block_and_lf():
+    block = _make_block(b"abcd") + b"\n"
+    assert _socket_wave([block[:2], block[2:]], calls=1) == [b"abcd"]
+
+
+def test_socket_crlf_block():
+    assert _socket_wave([b"#14abcd\r\n"], calls=1) == [b"abcd"]
+
+
+@pytest.mark.parametrize("frame", [
+    b"x14abcd\n", b"#x4abcd\n", b"#1xabcd\n", b"#04\n", b"#49999\n", b"#14ab\n",
+])
+def test_socket_malformed_block_is_query_error(frame):
+    with pytest.raises((QueryError, CommunicationError)) as exc:
+        _socket_wave([frame], calls=1)
+    if frame != b"#14ab\n":
+        assert isinstance(exc.value, QueryError)
+
+
+def test_socket_truncated_payload_is_transport_error():
+    with pytest.raises(CommunicationError):
+        _socket_wave([b"#14ab\n"], calls=1)
+
+
+def test_socket_consecutive_blocks_remain_aligned():
+    assert _socket_wave([b"#14one!\n", b"#14two!\n"], calls=2) == [b"one!", b"two!"]

@@ -41,7 +41,7 @@ from .errors import (
 from .instrument import ASR3000, ASR3300
 from .transport import DEFAULT_PORT, DEFAULT_TIMEOUT
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = [
     "ASR3000",

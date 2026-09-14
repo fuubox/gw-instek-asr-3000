@@ -1,4 +1,4 @@
-# gw-instek-asr
+# gw-instek-asr-3000
 
 A pure-Python driver for the **GW Instek ASR-3000 series** programmable
 AC/DC power source (ASR-3200, ASR-3300, ASR-3400, ASR-3400HF).  The MVP

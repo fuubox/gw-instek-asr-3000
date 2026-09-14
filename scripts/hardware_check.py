@@ -5,9 +5,9 @@ confirmation at each step, and logs everything to ``logs/`` for later review.
 
 Usage::
 
-    python scripts/hardware_check.py 192.168.1.100
+    python scripts/hardware_check.py 192.168.1.100 --allow-output
     # or
-    ASR_HOST=192.168.1.100 python scripts/hardware_check.py
+    ASR_HOST=192.168.1.100 python scripts/hardware_check.py --allow-output
 """
 
 from __future__ import annotations

@@ -7,6 +7,7 @@ from types import SimpleNamespace
 
 import pytest
 
+
 def test_run_checklist_logs(monkeypatch, tmp_path, instrument, transport):
     monkeypatch.setenv("ASR_LOG_DIR", str(tmp_path))
 

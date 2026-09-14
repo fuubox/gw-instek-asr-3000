@@ -34,6 +34,7 @@ written to a timestamped log for later review.
 | `--asr-host` / `ASR_HOST` | —     | Instrument IP or hostname (required)     |
 | `--asr-port` / `ASR_PORT` | `2268` | Socket port                              |
 | `--non-interactive`    | off     | Skip operator prompts (record `UNVERIFIED`) |
+| `--allow-output`       | off     | Authorize reset/configuration and energized output |
 | `ASR_LOG_DIR`          | `logs`  | Where result logs are written            |
 
 Without a host, the pytest tests are **skipped** (not failures). With a host

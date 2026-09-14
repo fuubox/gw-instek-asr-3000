@@ -258,15 +258,15 @@ class SystemCommands(SCPIBase):
 
     def tcpip_control(self) -> int:
         """``:SYSTem:COMMunicate:TCPip:CONTrol?`` - socket port number (2268)."""
-        return self.query_int(":SYSTem:COMMunicate:TCPip:CONTrol?")
+        return self.query_int_required(":SYSTem:COMMunicate:TCPip:CONTrol?")
 
     def usb_front_state(self) -> int:
         """``:SYSTem:COMMunicate:USB:FRONt:STATe?`` - front USB-A port state."""
-        return self.query_int(":SYSTem:COMMunicate:USB:FRONt:STATe?")
+        return self.query_int_required(":SYSTem:COMMunicate:USB:FRONt:STATe?")
 
     def usb_rear_state(self) -> int:
         """``:SYSTem:COMMunicate:USB:REAR:STATe?`` - rear USB-B port state."""
-        return self.query_int(":SYSTem:COMMunicate:USB:REAR:STATe?")
+        return self.query_int_required(":SYSTem:COMMunicate:USB:REAR:STATe?")
 
     # -- configuration -----------------------------------------------------
 

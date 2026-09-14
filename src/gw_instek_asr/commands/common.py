@@ -22,7 +22,7 @@ class CommonCommands(SCPIBase):
 
     def standard_event_status(self) -> int:
         """``*ESR?`` - query (and clear) the Standard Event Status register."""
-        return self.query_int("*ESR?")
+        return self.query_int_required("*ESR?")
 
     def idn(self) -> str:
         """``*IDN?`` - return the raw identification string."""
@@ -69,7 +69,7 @@ class CommonCommands(SCPIBase):
 
     def status_byte(self) -> int:
         """``*STB?`` - query the Status Byte register."""
-        return self.query_int("*STB?")
+        return self.query_int_required("*STB?")
 
     def wait(self) -> None:
         """``*WAI`` - wait for all outstanding commands to complete."""

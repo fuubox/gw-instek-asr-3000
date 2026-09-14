@@ -20,9 +20,8 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from gw_instek_asr import ASR3300  # noqa: E402, I001
 from tests.integration.support import ResultLog, run_checklist  # noqa: E402
-
-from gw_instek_asr import ASR3300  # noqa: E402
 
 
 def main() -> int:

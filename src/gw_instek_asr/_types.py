@@ -366,17 +366,7 @@ def as_bool(value: Any) -> bool:
 
 def fmt_bool(value: Any) -> str:
     """Format a boolean value as ``ON``/``OFF``."""
-    if isinstance(value, str):
-        key = _normalize(value)
-        if key in ("ON", "TRUE"):
-            return "ON"
-        if key in ("OFF", "FALSE"):
-            return "OFF"
-        try:
-            return "ON" if int(key, 10) else "OFF"
-        except ValueError:
-            pass
-    return "ON" if bool(value) else "OFF"
+    return "ON" if as_bool(value) else "OFF"
 
 
 def fmt_number(value: Any) -> str:

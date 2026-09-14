@@ -42,6 +42,12 @@ def test_fmt_bool_accepts_signed_numeric_strings():
     assert fmt_bool("+0") == "OFF"
 
 
+def test_fmt_bool_rejects_ambiguous_values():
+    for value in ("maybe", object(), [], {}):
+        with pytest.raises(InvalidValueError):
+            fmt_bool(value)
+
+
 def test_fmt_number():
     assert fmt_number(150.0) == "150.0"
     assert fmt_number(60) == "60.0"

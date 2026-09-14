@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import pytest
+
 from gw_instek_asr import PowerOnState
+from gw_instek_asr import InvalidValueError
 
 
 def test_output_state(instrument, transport):
@@ -8,6 +11,13 @@ def test_output_state(instrument, transport):
     assert transport.sent[-1] == b":OUTPut:STATe ON\n"
     transport.queue_line("+1")
     assert instrument.output_state() is True
+
+
+def test_output_state_rejects_invalid_without_sending(instrument, transport):
+    sent_before = list(transport.sent)
+    with pytest.raises(InvalidValueError):
+        instrument.output_state("OF")
+    assert transport.sent == sent_before
 
 
 def test_output_helpers(instrument, transport):
